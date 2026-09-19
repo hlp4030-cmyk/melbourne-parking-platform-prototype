@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'parkwise. · Melbourne CBD parking',
+  title: 'Parking Melbourne · Melbourne CBD parking',
   description: 'Find live on-street parking bays and understand restrictions across Melbourne CBD.',
   generator: 'v0.app',
   icons: {

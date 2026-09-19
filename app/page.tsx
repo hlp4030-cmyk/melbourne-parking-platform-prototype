@@ -30,7 +30,7 @@ export default function Page() {
   return (
     <main className="flex h-dvh min-h-0 flex-col overflow-hidden bg-[#eaf0ed] text-[#17342d]">
       <header className="relative z-30 flex h-14 shrink-0 items-center justify-between border-b border-white/60 bg-[#f9fcfa]/95 px-3 shadow-sm backdrop-blur md:h-16 md:px-8">
-        <button className="flex items-center gap-2" onClick={() => setStarted(false)} aria-label="Return to Parkwise home"><span className="grid size-8 place-items-center rounded-lg bg-[#126b50] text-white md:size-9"><CarFront className="size-4 md:size-5" /></span><span className="text-base font-bold tracking-tight md:text-lg">parkwise<span className="text-[#e5a52d]">.</span></span></button>
+        <button className="flex items-center gap-2" onClick={() => setStarted(false)} aria-label="Return to Parking Melbourne home"><span className="grid size-8 place-items-center rounded-lg bg-[#126b50] text-white md:size-9"><CarFront className="size-4 md:size-5" /></span><span className="text-base font-bold tracking-tight md:text-lg">Parking Melbourne</span></button>
         <div className="hidden items-center gap-2 text-xs font-semibold text-[#55736a] sm:flex"><span className="size-2 rounded-full bg-[#28b487]" /> Live data · Melbourne CBD</div>
         <Button variant="ghost" size="icon" className="size-9 rounded-full" aria-label="Help"><CircleHelp /></Button>
       </header>
