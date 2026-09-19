@@ -36,17 +36,17 @@ export default function Page() {
       </header>
 
       <section className="relative flex min-h-0 flex-1 w-full flex-col overflow-hidden">
-        <div className="min-h-0 flex-1"><ParkingMap bays={filtered} selected={selected} onSelect={setSelected} /></div>
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-2.5 md:p-5"><div className="pointer-events-auto mx-auto flex max-w-3xl flex-col gap-2 rounded-2xl border border-white/70 bg-white/95 p-2 shadow-xl shadow-[#17342d]/15 backdrop-blur sm:flex-row">
+        
+        <div className="relative z-20 order-1 shrink-0 border-b border-[#d8e4de] bg-[#f9fcfa] p-2.5 md:p-4"><div className="mx-auto flex max-w-3xl flex-col gap-2 rounded-2xl border border-white/70 bg-white/95 p-2 shadow-xl shadow-[#17342d]/15 backdrop-blur sm:flex-row">
           <div className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-xl bg-[#eef4f1] px-3"><Search className="size-5 shrink-0 text-[#55736a]" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search a street, e.g. Collins Street" className="w-full bg-transparent text-sm outline-none placeholder:text-[#789087] md:text-base" aria-label="Search by street" />{query && <button onClick={() => setQuery('')} aria-label="Clear search"><X className="size-5" /></button>}</div>
           <Button variant={vacantOnly ? 'default' : 'outline'} onClick={() => setVacantOnly(!vacantOnly)} className="min-h-11 rounded-xl px-4"><Filter data-icon="inline-start" /> Vacant only</Button>
         </div></div>
 
-        <div className="absolute bottom-2.5 left-2.5 right-2.5 z-20 md:bottom-6 md:left-8 md:right-auto md:w-[390px]">
+        <div className="relative order-2 min-h-0 flex-1"><ParkingMap bays={filtered} selected={selected} onSelect={setSelected} /><div className="absolute bottom-6 right-3 z-10 hidden rounded-2xl border border-white/70 bg-white/95 p-3 text-xs shadow-lg backdrop-blur md:block"><div className="flex items-center gap-2"><span className="size-3 rounded-full bg-[#28b487]" /> Vacant</div><div className="mt-2 flex items-center gap-2"><span className="size-3 rounded-full bg-[#ef5350]" /> Occupied</div></div><button className="absolute right-3 top-4 z-10 grid size-11 place-items-center rounded-xl border border-white/70 bg-white text-[#126b50] shadow-lg md:right-6 md:top-6" aria-label="Centre on my location"><Navigation className="size-5" /></button></div>
+        <div className="relative z-20 order-3 shrink-0 border-t border-[#d8e4de] bg-[#eaf0ed] p-2.5 md:p-5 md:pl-8"> <div className="md:w-[390px]">
           {selected ? <Details bay={selected} onClose={() => setSelected(null)} /> : <div className="rounded-2xl border border-white/70 bg-white/95 p-3.5 shadow-xl backdrop-blur md:p-4"><div className="flex items-center justify-between"><p className="text-sm font-semibold md:text-base">Find a bay in Melbourne CBD</p><span className="text-xs text-[#55736a]">{filtered.length} shown</span></div><div className="mt-2.5 flex flex-wrap gap-1.5">{['All time limits', '1P', '2P', '3P', '4P'].map((option) => <button key={option} onClick={() => setPeriod(option)} className={`rounded-full px-2.5 py-1.5 text-[11px] font-semibold transition md:px-3 md:py-2 md:text-xs ${period === option ? 'bg-[#17342d] text-white' : 'bg-[#edf3f0] text-[#55736a]'}`}>{option}</button>)}</div><p className="mt-2.5 flex items-center gap-2 text-xs text-[#55736a]"><MapPin className="size-4" /> Tap a marker to see restrictions</p></div>}
-        </div>
-        <div className="absolute bottom-6 right-3 z-10 hidden rounded-2xl border border-white/70 bg-white/95 p-3 text-xs shadow-lg backdrop-blur md:block"><div className="flex items-center gap-2"><span className="size-3 rounded-full bg-[#28b487]" /> Vacant</div><div className="mt-2 flex items-center gap-2"><span className="size-3 rounded-full bg-[#ef5350]" /> Occupied</div></div>
-        <button className="absolute right-3 top-20 z-10 grid size-11 place-items-center rounded-xl border border-white/70 bg-white text-[#126b50] shadow-lg md:right-6 md:top-24" aria-label="Centre on my location"><Navigation className="size-5" /></button>
+        </div></div>
+
       </section>
     </main>
   )
