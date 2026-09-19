@@ -1,0 +1,54 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+import { ArrowRight, CarFront, ChevronDown, CircleHelp, Clock3, Filter, MapPin, Navigation, Search, ShieldCheck, Sparkles, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import dynamic from 'next/dynamic'
+import type { Bay } from '@/components/parking-map'
+
+const ParkingMap = dynamic(() => import('@/components/parking-map').then((mod) => mod.ParkingMap), { ssr: false })
+
+const bays: Bay[] = [
+  { id: 'CB-1042', street: 'Collins Street', cross: 'near Queen Street', restriction: '1P MTR M–F 9:30–18:30', detail: 'You may park for a maximum of 1 hour (1P) between 9:30 am and 6:30 pm, Monday to Friday. Payment is required via meter or parking app.', status: 'vacant', lat: -37.8176, lng: 144.961, time: 'Updated 1 min ago' },
+  { id: 'CB-1043', street: 'Collins Street', cross: 'near Queen Street', restriction: '2P MTR M–SAT 18:30–20:30', detail: 'You may park for a maximum of 2 hours (2P) between 6:30 pm and 8:30 pm, Monday to Saturday. Payment is required via meter or parking app.', status: 'occupied', lat: -37.8179, lng: 144.963, time: 'Updated 1 min ago' },
+  { id: 'LB-2031', street: 'Little Bourke Street', cross: 'near William Street', restriction: '2P RPA 7:30–23:00 M–SUN', detail: 'Parking is permitted for a maximum of 2 hours (2P) between 7:30 am and 11:00 pm, Monday to Sunday. RPA stands for Resident Parking Area.', status: 'vacant', lat: -37.8145, lng: 144.959, time: 'Updated 2 mins ago' },
+  { id: 'FL-1188', street: 'Flinders Lane', cross: 'near Swanston Street', restriction: '4P TKT A M–F 7:30–18:30', detail: 'Parking is permitted for a maximum of 4 hours (4P) between 7:30 am and 6:30 pm, Monday to Friday. Purchase a ticket or pay via the app.', status: 'occupied', lat: -37.8159, lng: 144.966, time: 'Updated 1 min ago' },
+  { id: 'BO-4007', street: 'Bourke Street', cross: 'near Russell Street', restriction: 'P 10MINS 7:30–18:30', detail: 'Parking or stopping is permitted for a maximum of 10 minutes between 7:30 am and 6:30 pm.', status: 'vacant', lat: -37.813, lng: 144.9675, time: 'Updated 2 mins ago' },
+  { id: 'EX-3015', street: 'Exhibition Street', cross: 'near Little Collins', restriction: '2P DIS M–F 7:30–18:30', detail: 'Only vehicles displaying a valid disability parking permit may park for a maximum of 2 hours between 7:30 am and 6:30 pm, Monday to Friday.', status: 'vacant', lat: -37.813, lng: 144.971, time: 'Updated 1 min ago' },
+]
+
+export default function Page() {
+  const [started, setStarted] = useState(false)
+  const [query, setQuery] = useState('')
+  const [vacantOnly, setVacantOnly] = useState(false)
+  const [period, setPeriod] = useState('All time limits')
+  const [selected, setSelected] = useState<Bay | null>(null)
+  const filtered = useMemo(() => bays.filter((bay) => (!vacantOnly || bay.status === 'vacant') && (!query || bay.street.toLowerCase().includes(query.toLowerCase())) && (period === 'All time limits' || bay.restriction.startsWith(period))), [query, vacantOnly, period])
+
+  if (!started) return <Landing onStart={() => setStarted(true)} />
+  return (
+    <main className="min-h-screen bg-[#f5f7f6] text-[#17342d]">
+      <header className="relative z-20 flex items-center justify-between border-b border-[#d9e5df] bg-white px-4 py-3 md:px-8">
+        <button className="flex items-center gap-2" onClick={() => setStarted(false)} aria-label="Return to Parkwise home"><span className="grid size-9 place-items-center rounded-xl bg-[#126b50] text-white"><CarFront className="size-5" /></span><span className="text-lg font-bold tracking-tight">parkwise<span className="text-[#e5a52d]">.</span></span></button>
+        <div className="hidden items-center gap-2 text-xs font-semibold text-[#55736a] md:flex"><span className="size-2 rounded-full bg-[#28b487]" /> Live data · Melbourne CBD</div>
+        <Button variant="ghost" size="icon" className="rounded-full" aria-label="Help"><CircleHelp /></Button>
+      </header>
+      <section className="relative h-[calc(100vh-65px)] min-h-[680px] overflow-hidden">
+        <div className="absolute inset-0"><ParkingMap bays={filtered} selected={selected} onSelect={setSelected} /></div>
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 p-3 md:p-6"><div className="pointer-events-auto mx-auto flex max-w-3xl flex-col gap-2 rounded-2xl border border-[#d9e5df] bg-white/95 p-2 shadow-xl shadow-[#17342d]/10 backdrop-blur md:flex-row">
+          <div className="flex min-h-12 flex-1 items-center gap-3 rounded-xl bg-[#f5f7f6] px-3"><Search className="size-5 text-[#55736a]" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search a street, e.g. Collins Street" className="w-full bg-transparent text-base outline-none placeholder:text-[#789087]" aria-label="Search by street" />{query && <button onClick={() => setQuery('')} aria-label="Clear search"><X className="size-5" /></button>}</div>
+          <Button variant={vacantOnly ? 'default' : 'outline'} onClick={() => setVacantOnly(!vacantOnly)} className="min-h-12 rounded-xl px-4"><Filter data-icon="inline-start" /> Vacant only</Button>
+        </div></div>
+        <div className="absolute bottom-6 left-3 right-3 z-10 md:bottom-8 md:left-8 md:right-auto md:w-[390px]">
+          {selected ? <Details bay={selected} onClose={() => setSelected(null)} /> : <div className="rounded-2xl border border-[#d9e5df] bg-white/95 p-4 shadow-xl backdrop-blur"><div className="flex items-center justify-between"><p className="font-semibold">Find a bay in Melbourne CBD</p><span className="text-xs text-[#55736a]">{filtered.length} shown</span></div><div className="mt-3 flex flex-wrap gap-2">{['All time limits', '1P', '2P', '3P', '4P'].map((option) => <button key={option} onClick={() => setPeriod(option)} className={`rounded-full px-3 py-2 text-xs font-semibold transition ${period === option ? 'bg-[#17342d] text-white' : 'bg-[#edf3f0] text-[#55736a]'}`}>{option}</button>)}</div><p className="mt-3 flex items-center gap-2 text-xs text-[#55736a]"><MapPin className="size-4" /> Tap a marker to see restrictions</p></div>}
+        </div>
+        <div className="absolute bottom-6 right-3 z-10 hidden rounded-2xl border border-[#d9e5df] bg-white/95 p-3 text-xs shadow-lg backdrop-blur md:block"><div className="flex items-center gap-2"><span className="size-3 rounded-full bg-[#28b487]" /> Vacant</div><div className="mt-2 flex items-center gap-2"><span className="size-3 rounded-full bg-[#ef5350]" /> Occupied</div></div>
+        <button className="absolute right-3 top-24 z-10 grid size-12 place-items-center rounded-xl border border-[#d9e5df] bg-white text-[#126b50] shadow-lg md:right-6" aria-label="Centre on my location"><Navigation className="size-5" /></button>
+      </section>
+    </main>
+  )
+}
+
+function Details({ bay, onClose }: { bay: Bay; onClose: () => void }) { return <article className="rounded-2xl border border-[#d9e5df] bg-white p-5 shadow-xl"><div className="flex items-start justify-between"><div><div className="flex items-center gap-2 text-sm font-bold"><span className={`size-3 rounded-full ${bay.status === 'vacant' ? 'bg-[#28b487]' : 'bg-[#ef5350]'}`} />{bay.status === 'vacant' ? 'Vacant now' : 'Occupied'}</div><h2 className="mt-2 text-xl font-bold">{bay.street}</h2><p className="text-sm text-[#55736a]">{bay.cross} · Bay {bay.id}</p></div><button onClick={onClose} className="rounded-full p-2 text-[#55736a] hover:bg-[#edf3f0]" aria-label="Close parking information"><X className="size-5" /></button></div><div className="my-4 rounded-xl bg-[#edf3f0] p-3"><p className="text-sm font-bold tracking-wide text-[#126b50]">{bay.restriction}</p><p className="mt-2 text-sm leading-6 text-[#35564c]">{bay.detail}</p></div><p className="flex items-center gap-2 text-xs text-[#789087]"><Clock3 className="size-4" /> {bay.time}</p></article> }
+
+function Landing({ onStart }: { onStart: () => void }) { return <main className="min-h-screen overflow-hidden bg-[#17342d] text-white"><div className="mx-auto flex min-h-screen max-w-7xl flex-col px-5 py-6 md:px-10"><header className="flex items-center justify-between"><div className="flex items-center gap-2"><span className="grid size-10 place-items-center rounded-xl bg-[#28b487] text-[#17342d]"><CarFront className="size-5" /></span><span className="text-xl font-bold tracking-tight">parkwise<span className="text-[#e5a52d]">.</span></span></div><span className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-semibold text-[#b8d3c8]">Melbourne CBD</span></header><div className="grid flex-1 items-center gap-12 py-16 md:grid-cols-[1.1fr_.9fr] md:py-20"><div><div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#4d8170] bg-[#244c41] px-3 py-2 text-xs font-bold text-[#b8ead9]"><Sparkles className="size-4" /> Real-time parking, made simple</div><h1 className="max-w-2xl text-5xl font-bold leading-[1.03] tracking-[-0.04em] md:text-7xl">Spend less time looking. <span className="text-[#e5a52d]">Park smarter.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-[#b8d3c8]">A clear, live view of on-street parking across Melbourne CBD. Find a bay, understand the restrictions, and get on with your day.</p><Button onClick={onStart} className="mt-8 min-h-14 rounded-xl bg-[#e5a52d] px-6 text-base font-bold text-[#17342d] hover:bg-[#f0bd55]">Explore live bays <ArrowRight data-icon="inline-end" /></Button><div className="mt-10 flex flex-wrap gap-6 text-sm text-[#b8d3c8]"><span className="flex items-center gap-2"><ShieldCheck className="size-4 text-[#28b487]" /> Driver-friendly design</span><span className="flex items-center gap-2"><MapPin className="size-4 text-[#28b487]" /> CBD coverage</span></div></div><div className="relative hidden min-h-[440px] md:block"><div className="absolute inset-8 rotate-[-5deg] rounded-[2.5rem] border border-white/10 bg-[#244c41] p-5 shadow-2xl"><div className="h-full overflow-hidden rounded-[1.8rem] bg-[#dce8df] opacity-95"><div className="flex h-full rotate-[5deg] items-center justify-center"><div className="grid size-72 grid-cols-5 gap-4 opacity-70">{Array.from({ length: 25 }).map((_, i) => <span key={i} className={`rounded-full ${i % 4 === 0 ? 'bg-[#ef5350]' : i % 3 === 0 ? 'bg-[#28b487]' : 'bg-[#88a79c]'}`} />)}</div></div></div></div><div className="absolute bottom-0 left-0 rounded-2xl border border-[#4d8170] bg-[#244c41] p-4 shadow-xl"><p className="text-xs text-[#b8d3c8]">Live availability</p><p className="mt-1 text-3xl font-bold">68<span className="text-lg text-[#b8d3c8]">%</span></p></div></div></div><div className="border-t border-white/15 pt-5 text-xs text-[#8fb7a8]"><span className="inline-flex items-center gap-2 rounded-full bg-[#244c41] px-3 py-2"><Sparkles className="size-3.5 text-[#e5a52d]" /> Coming soon: Predictive Availability Heatmap + private off-street car parks</span></div></div></main> }
